@@ -1,0 +1,655 @@
+/* style.css (V7.6.45 - Definitive Elite Console: Hexagonal Button Replaced with Standard Glowing Button)*/
+
+/* --- 0. KEYFRAME ANIMATION FOR GLOW --- */
+@keyframes pulseGlow {
+    from {
+        /* Adjusted to use --acc for collected state pulse */
+        box-shadow: 0 0 5px var(--acc), 0 0 10px var(--acc); 
+    }
+    to {
+        box-shadow: 0 0 15px var(--acc)80, 0 0 20px var(--acc)30;
+    }
+}
+
+/* --- 1. CSS CUSTOM PROPERTIES (VARIABLES) - ROOT BLOCK --- */
+:root {
+    /* FUTURISTIC CONSOLE (HIGH CONTRAST BLACK/AMBER) */
+    --bg: #0A0A0A;          
+    --bg2: #0A0A0A;         /* Deep Charcoal (Containers) */
+    --fg: #E8EDF0;          /* Off-White/Light Grey (Foreground/Main Text) */
+    
+    --acc: #FF8000;         /* Rich Amber/Fiery Orange (Primary Accent/Glow / COLLECT ACTIVE) */
+    --acc-low: #362200;     /* Darkened Amber (Subtle Console Border / SAVE BUTTON BG) */
+    
+    /* REFINED SYSTEM COLORS */
+    --success: #00A36C;     /* Deep Teal/Jade (Success Cues: Checkbox, Rank Up) */
+    --danger: #CC3333;      /* Deep Red (Remove/Alert) */
+    --action: #0077B6;      /* Bright Blue (Secondary Cues like Permanent Toggle fill) */
+    --neutral-action: #444444; /* Dark Grey (Auth/Log In/Set Quota) */
+    
+    /* Derived Colors for UX */
+    --border: #1A1A1A;      /* Dark Divider Line */
+    --comp-bg: #1A1A1A;     /* Completed Task Slot Background - Very Dark */
+    --amOra: #FFBF00; /*amber orange*/
+    --darbur: #CC5500; /*dark brun*/
+    --pur: #9B30FF;
+}
+
+
+/* General Reset and Font */ 
+body {
+    font-family: 'Space Mono', monospace, 'Courier New', Courier;
+    /* BACKGROUND FIX: Subtle Radial Gradient for Depth */
+    background: radial-gradient(circle at center top, #111111 0%, #000000 70%); 
+    background-color: var(--bg); /* Fallback */
+    min-height: 100vh;
+    color: var(--fg);
+    margin: 0;
+    padding: 0;
+}
+* {
+    box-sizing: border-box;
+}
+
+/* --- 2. HEADER BAR FIXES (Layout Stabilization & Positioning Fix) --- */
+.header-bar {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 10px 15px; 
+    background-color: var(--bg2);      
+    color: var(--fg); 
+    border-bottom: 3px solid var(--acc); 
+    box-shadow: 0 2px 10px rgba(255, 128, 0, 0.2); 
+    margin-bottom: 20px;
+}
+.header-menu { 
+    position: relative; 
+    z-index: 20; 
+    flex-shrink: 0;
+} 
+.rank-display { 
+    font-size: 16px; 
+    white-space: nowrap; 
+    font-weight: bold; 
+    min-width: 0; 
+    flex-shrink: 1; 
+    overflow: hidden; 
+}
+.rank-label { 
+    color: var(--acc);                     
+    margin-right: 5px; 
+    font-weight: bold; 
+}
+.rank-title { 
+    color: var(--fg);                     
+    font-weight: bold; 
+    text-shadow: 0 0 5px var(--acc)80; 
+}
+.hamburger-btn {
+    background: none; 
+    color: var(--acc);             
+    border: 1px solid var(--acc);  
+    padding: 5px 10px; 
+    cursor: pointer; 
+    font-size: 20px; 
+    line-height: 1; 
+    border-radius: 4px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+.hamburger-btn:hover {
+    box-shadow: 0 0 5px var(--acc);
+}
+
+/* --- MENU DROPDOWN & FLEX LAYOUT (V7.6.39 - FINALIZED MENU LAYOUT) --- */
+.menu-dropdown {
+    display: none; 
+    position: absolute; 
+    top: 100%; 
+    right: 0; 
+    background-color: var(--bg2);             
+    border-radius: 4px;
+    border: 5px solid var(--pur);
+    box-shadow: 0 0 10px rgba(155, 48, 255, 1.0);
+    z-index: 10; 
+    min-width: 350px; 
+    padding: 0;
+}
+.menu-dropdown.show { 
+    display: block; 
+}
+
+/* The general style for all rows/links inside the dropdown */
+.menu-section-row, .menu-shop-text {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; 
+    width: 100%;
+    padding: 10px 15px;
+    background: var(--bg2);
+    cursor: default;
+    
+    /* Glowing Separator Line (ACTION color) */
+    border-bottom: 2px solid var(--action);
+    filter: drop-shadow(0 0 4px var(--action)80);
+    
+    color: var(--fg);
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+/* Separator removal for top and bottom elements (per your request) */
+.menu-top-row {
+    filter: none; 
+}
+.menu-logout-delete-row {
+    border-bottom: 2px solid var(--action);
+    border-bottom: none;
+    filter: none;
+    padding: 10px 15px !important;
+}
+
+/* 1. STATS & SHOP ROW */
+.menu-stats-block {
+    display: flex;
+    flex-direction: column; 
+    gap: 2px;
+}
+.menu-stats-line {
+    color: var(--fg);
+    font-size: 1em;
+}
+.menu-shop-link {
+    color: var(--acc); 
+    font-size: 1.5em; 
+    text-decoration: none;
+    padding: 5px;
+}
+.menu-shop-link:hover {
+    color: var(--acc);
+    background-color: var(--border);
+}
+
+/* 2. FAIL SYSTEM TOGGLE (Base Sizing) */
+/* .menu-fail-system is covered by .menu-section-row */
+.toggle-small-btn {
+    padding: 5px 12px !important;
+    font-size: 0.9em !important;
+    width: auto !important; 
+    flex-shrink: 0;
+    margin-left: 15px;
+    margin-top: 0 !important; 
+}
+
+/* 3. SHOP LINK (Single line link with separator) */
+.menu-shop-text {
+    justify-content: flex-start; 
+    cursor: pointer;
+}
+.menu-shop-text:hover {
+    background-color: var(--border);
+}
+
+/* 4. LOG OUT / DELETE ROW */
+.menu-logout-delete-row {
+    padding: 0; 
+    display: flex; 
+}
+.menu-logout-link, .menu-delete-link {
+    display: inline-block; 
+    padding: 10px 15px; 
+    background: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+    text-align: center;
+    flex-grow: 1; 
+    text-decoration: none;
+}
+/**/
+.menu-delete-link {
+    border-left: 3px solid var(--acc) !important; 
+    border-right: 3px solid var(--acc) !important;
+    border-radius: 10px;
+    filter: drop-shadow(0 0 4px var(--acc)80) !important;
+}
+/*ad for veritical line*/
+.menu-logout-link {
+    color: var(--fg);
+    border-right: 3px solid var(--acc) !important; 
+    border-left: 3px solid var(--acc) !important;
+    border-radius: 10px;
+    filter: drop-shadow(0 0 4px var(--acc)80) !important;
+}
+.menu-delete-link {
+    color: var(--danger);
+}
+
+.menu-logout-link:hover, .menu-delete-link:hover {
+    background-color: var(--border);
+}
+/* Ensure the old generic styles are overridden */
+.menu-dropdown a, .menu-dropdown button, .dropdown-sp-collected {
+    /* Remove all the old conflicting styles */
+    display: unset; 
+    padding: unset;
+    border: unset;
+    filter: unset;
+    background: unset;
+}
+.dropdown-sp-collected { 
+    /* This class is now obsolete and replaced by .menu-stats-line */
+    display: none !important; 
+}
+
+
+/* --- 3. CONSOLE CONTAINER STYLING (Gold Borders) --- */
+.container { 
+    max-width: 600px; 
+    margin: 20px auto; 
+}
+.profile-container, .task-manager, .auth-container { 
+    padding: 20px; 
+    background-color: var(--bg2);          
+    margin-bottom: 20px; 
+    border-radius: 9px;
+    border: 3px solid #FFBF00;
+    box-shadow: 0 0 5px rgba(255, 191, 0);
+}
+.stats-line { 
+    color: var(--fg); 
+}
+.auth-container h2 { 
+    color: var(--acc);                     
+}
+input[type="text"], input[type="password"], #new-task-input, #objective-input, .quota-input { 
+    width: 100%; 
+    padding: 10px; 
+    margin: 8px 0; 
+    box-sizing: border-box; 
+    background: var(--bg); 
+    border: 1px solid var(--acc);          
+    color: var(--fg);                     
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+input[type="text"]:focus, input[type="password"]:focus, #new-task-input:focus, #objective-input:focus, .quota-input:focus {
+    border-color: var(--acc); 
+    box-shadow: 0 0 5px var(--acc)50;
+    outline: none;
+}
+.auth-btn:not(.sp-btn) { 
+    background-color: var(--acc);  
+    color: var(--fg); 
+    padding: 10px 15px; 
+    border: 1px solid var(--acc); 
+    cursor: pointer; 
+    width: 100%; 
+    margin-top: 10px; 
+    transition: all 0.2s;
+}
+.auth-btn:not(.sp-btn):not([disabled]):hover {
+    background-color: var(--acc);
+    color: var(--acc);
+    box-shadow: 0 0 8px var(--acc);
+    border: 1px solid var(--acc);
+}
+
+
+/* --- 4. OBJECTIVE SAVE BUTTON FIX (Layout & Color) --- */
+.objective-container { 
+    display: flex; 
+    align-items: center; 
+    margin-bottom: 15px; 
+}
+.objective-container input { 
+    flex-grow: 1; 
+    margin-right: 5px; 
+}
+.objective-container button { 
+    padding: 10px 15px; 
+    background-color: var(--bg);          /* Dark Amber SAVE button */
+    color: var(--fg);          
+    font-weight: bold;
+    border: none; 
+    cursor: pointer; 
+    transition: all 0.2s;
+    flex-shrink: 0;
+    text-color: black;
+    border: 2px solid var(--acc);
+    box-shadow: 0 0 5px rgba(255, 128, 0, 0.10);
+}
+.objective-container button:hover { 
+    background-color: var(--bg2); /* Fills with bright amber on hover */
+    color: var(--fg);
+} 
+
+/* ------------------------------------------------------------------ */
+/* --- 5. CLAIM/CLAIMED BUTTON - STANDARD GLOWING RECTANGLE (V7.6.45) --- */
+/* ------------------------------------------------------------------ */
+.sp-btn-container {
+    margin-top: -10px;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* --- 6. TASK LOG FIXES (Clarity & Alignment) --- */
+.task-slot { 
+    display: flex; 
+    align-items: center; 
+    margin-bottom: 10px; 
+    padding: 8px; 
+    border: 1px solid var(--acc);
+    box-shadow: 0 0 5px rgba(255, 128, 0, 0.05); 
+    transition: all 0.2s; 
+    border-radius: 9px;
+    justify-content: space-between; 
+}
+.task-slot.completed-slot { 
+    background-color: var(--comp-bg); 
+}
+.task-description-wrapper { 
+    flex-grow: 1; 
+    margin-left: 10px; 
+    display: flex; 
+    align-items: center; 
+    min-width: 0; 
+}
+.task-description.completed { 
+    opacity: 0.5; 
+    color: var(--fg); 
+    text-decoration: line-through; 
+}
+.permanent-indicator { 
+    color: var(--acc);                     
+    margin-right: 8px; 
+    font-size: 1.1em; 
+    filter: drop-shadow(0 0 3px var(--acc)99); 
+}
+.task-checkbox:checked { 
+    accent-color: var(--success);
+}
+.task-buttons-wrapper {
+    /* Anchor the buttons to the far right */
+    display: flex;
+    align-items: center;
+    flex-shrink: 0; 
+    margin-left: auto; 
+}
+.task-slot .toggle-btn, .task-slot .remove-btn, .task-slot .permanent-btn { 
+    background: none; 
+    padding: 3px 6px; 
+    cursor: pointer; 
+    margin-left: 5px; 
+    border-radius: 2px solid var(--acc:); 
+    box-shadow: 0 0 5px rgba(255, 128, 0, 0.15);
+    font-size: 14px; 
+    line-height: 1; 
+    transition: all 0.2s;
+}
+
+/* Task Buttons (Lock/Unlock/Remove) */
+.permanent-btn {
+    border: 1px solid var(--acc); 
+    color: var(--fg);
+}
+.permanent-btn[data-permanent="true"] { 
+    background-color: var(--darbur); 
+    color: var(--fg);
+    border-color: var(--acc); 
+}
+.permanent-btn[data-permanent="false"]:hover { 
+    background-color: var(--acc-low);
+}
+.remove-btn { 
+    color: var(--fg);                     
+    border: 1px solid var(--acc); 
+}
+.remove-btn:hover { 
+    background-color: var(--danger); 
+    color: var(--fg);                     
+    border-color: var(--danger); 
+}
+
+/* Add Task and SP Button (ADD is Solid Amber) */
+.add-task-controls {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 5px;
+}
+.add-task-controls #new-task-input { 
+    flex-grow: 1; 
+    margin: 0;
+}
+.add-task-controls #task-type-select {
+    padding: 10px; 
+    background: var(--bg); 
+    color: var(--fg); 
+    border: 1px solid var(--acc); 
+    margin: 0;
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+}
+.add-task-controls .add-btn { 
+    width: auto; 
+    padding: 10px 15px;
+    margin: 0;
+    background-color: var(--acc);
+    color: var(--bg); 
+    font-weight: bold;
+    border: 1px solid var(--acc);
+}
+.add-task-controls .add-btn:hover {
+    background-color: var(--acc);
+    box-shadow: 0 0 10px var(--acc);
+    color: var(--bg);
+}
+
+
+/*--- FAILURE SYSTEM & QUOTA OVERRIDES CONTAINER --- */
+.failure-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 15px;
+    color: var(--fg);
+    background-color: var(--bg); 
+}
+.quota-input-container {
+    /* CRITICAL: Must be flex for alignment */
+    display: flex;
+    align-items: center; 
+    justify-content: space-between;
+    margin-top: 10px;
+    margin-bottom: 15px; 
+    padding-top: 15px;
+    gap: 10px; 
+}
+
+
+/* ------------------------------------------------------------------ */
+/* --- 7. QUOTA AND FAIL SYSTEM BUTTON OVERRIDES (V7.6.42 FIXES) --- */
+/* ------------------------------------------------------------------ */
+
+/* 1. Set Quota Button (EXPLICIT HEIGHT/PADDING FOR ALIGNMENT + Vertical Adjust) */
+.quota-input-container .set-quota-btn {
+    /* *** CRITICAL FIX: Explicit height and padding to match the input box *** */
+    height: 35px !important;
+    padding: 5px 15px !important; 
+    width: auto !important;        
+    
+    /* NEW: Ensure no unwanted top margin and align perfectly */
+    margin-top: 0 !important; 
+    vertical-align: middle;   
+
+    /* Style Overrides */
+    background-color: var(--bg) !important; 
+    color: var(--fg) !important;
+    border: 2px solid var(--acc) !important;
+    box-shadow: 0 0 8px var(--acc)80 !important;
+    transition: all 0.2s; 
+}
+/* Hover state for Set Quota */
+.quota-input-container .set-quota-btn:hover {
+    background-color: var(--bg2) !important; 
+    color: var(--acc) !important;
+    box-shadow: 0 0 12px var(--acc) !important;
+}
+
+/* 2. Fail System Toggle Button (Menu) */
+.menu-fail-system .toggle-small-btn {
+    /* Reinforce small size */
+    padding: 5px 12px !important; 
+    width: auto !important;
+    
+    /* Base style */
+    background-color: var(--bg) !important;
+    color: var(--fg) !important;
+    border: 2px solid var(--acc) !important;
+    box-shadow: 0 0 8px var(--acc)80 !important;
+    transition: all 0.2s;
+    border-radius: 10px;
+}
+/* Ensure background remains dark for ON/OFF states */
+.menu-fail-system .toggle-small-btn[data-enabled="false"],
+.menu-fail-system .toggle-small-btn[data-enabled="true"] {
+    background-color: var(--bg) !important; 
+    color: var(--fg) !important;
+}
+/* Hover state for the Toggle Button */
+.menu-fail-system .toggle-small-btn:hover {
+    background-color: var(--bg2) !important; 
+    color: var(--acc) !important;
+    box-shadow: 0 0 12px var(--acc) !important;
+}
+
+
+/* ------------------------------------------------------------------ */
+/* --- 8. DAILY QUOTA TEXT & INPUT GLOW (V7.6.42 FIXES) --- */
+/* ------------------------------------------------------------------ */
+
+/* Text glow for "Daily Quota:" label */
+.quota-input-container .quota-label {
+    color: var(--acc); 
+    font-weight: bold;
+    white-space: nowrap;
+    text-shadow: 0 0 5px var(--acc)80; 
+}
+
+/* Border and glow for the quota input field - HEIGHT/ALIGNMENT FIX */
+.quota-input-container .quota-input {
+    width: 60px; 
+    text-align: center;
+    padding: 5px;
+    height: 35px; 
+    margin: 0; 
+    vertical-align: middle; 
+    
+    /* Style */
+    background: var(--bg); 
+    border: 2px solid var(--acc); 
+    color: var(--fg);                     
+    box-shadow: 0 0 8px var(--acc)80; 
+    transition: border-color 0.2s, box-shadow 0.2s; 
+}
+
+/* Focus state for quota input */
+.quota-input-container .quota-input:focus {
+    border-color: var(--acc); 
+    box-shadow: 0 0 12px var(--acc); 
+    outline: none;
+}
+
+
+/* ------------------------------------------------------------------ */
+/* --- 9. SKEWED PARALLELOGRAM SEPARATOR (V7.6.44) --- */
+/* ------------------------------------------------------------------ */
+.quota-separator-skew {
+    /* Base Dimensions: Full width of old separator line, small height */
+    width: 60%; 
+    height: 6px; 
+    
+    background-color: var(--acc); /* Amber color for the line fill */
+    margin: 15px 0 25px auto; /* Center horizontally, space above/below */
+    
+    /* CRITICAL: Apply the skew transformation */
+    transform: skewX(-20deg); 
+    
+    /* Add the glow and remove rounded corners */
+    border-radius: 0; 
+    box-shadow: 0 0 8px var(--acc)80; /* Amber glow */
+}
+
+/* Hide the old rhombus class if it was still in HTML */
+.quota-separator {
+    display: none; 
+}
+
+
+/*Ranks Page Styling Fixes */
+.ranks-header-container .back-link {
+    color: var(--success) !important; 
+    text-decoration: none; 
+    font-size: 1.2em; 
+    font-weight: bold;
+    margin-bottom: 5px; 
+    padding: 2px 0; 
+    transition: color 0.2s;
+}
+.ranks-header-container .back-link:hover {
+    color: var(--fg) !important; 
+}
+.current-rank-display {
+    color: var(--fg); 
+    font-size: 0.9em;
+    padding: 2px 0;
+    text-transform: uppercase;
+}
+.current-rank-display .rank-title-display {
+    color: var(--fg); 
+    font-weight: bold;
+}
+.ranks-header-container + h1, 
+.ranks-header-container + h2 {
+    margin-top: 80px; 
+}
+.shop1 {
+    padding: 10px 15px;
+    background: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+    text-align: center;
+    width: 100%;
+    text-decoration: none;
+    border-top: 2px solid var(--action) !important;
+}
+
+.quota-separator-skew1 {
+    width: 60%;
+    height: 6px;
+
+    background-color: var(--acc); /* Amber color for the line fill */
+    margin: 15px 0 25px 0; /* Center horizontally, space above/below */
+
+    /* CRITICAL: Apply the skew transformation */
+    transform: skewX(-20deg);
+
+    /* Add the glow and remove rounded corners */
+    border-radius: 0;
+    box-shadow: 0 0 8px var(--acc)80; /* Amber glow */
+}
+.collecting-in-progress {
+    opacity: 0.5; /* Makes the button visually dim/fade */
+    pointer-events: none; /* Prevents clicks while AJAX is running */
+}
+#auth-submit-btn {
+    background-color: var(--acc); /* Example: A purple background */
+    color: var(--fg);
+    /* border: 1px solid #9966CC; */ /* Lighter purple border */
+    box-shadow: 0 0 10px var(--darbur); */ /* Subtle glow */
+}

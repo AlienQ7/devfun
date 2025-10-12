@@ -1,0 +1,166 @@
+/* ui.css - V10.2: Final FIX - Targets Existing HTML ID/Class (#sp-collect-btn) */
+
+/* --- 0. KEYFRAMES --- */
+/* Used for the 'CLAIMED' state (Blue Pulse) */
+@keyframes pulseBlueGlow {
+    0% {
+        box-shadow: 0 0 10px var(--claimed-main)80;
+    }
+    50% {
+        box-shadow: 0 0 30px var(--claimed-light)ff, 0 0 50px var(--claimed-main)cc;
+    }
+    100% {
+        box-shadow: 0 0 10px var(--claimed-main)80;
+    }
+}
+
+/* --- 1. UI Variables (Root Block for Easy Swapping) --- */
+:root {
+    /* --- CLAIM (Base/Hover) State Colors: GOLD/AMBER --- */
+    --claim-main: #FF8000;       /* Primary Gold/Orange */
+    --claim-light: #FFD299;      /* Lighter Gold/Amber */
+
+    /* --- CLAIMED State Colors: BLUE/CYAN --- */
+    --claimed-main: #FFBF00; /* #9B30FF; /*#FF8000; /*#00A3FF;     /* Primary Blue/Cyan */
+    --claimed-light: #FFBF00; /*#9B30FF; /*#FFD299; /*#79FFFF;    /* Lighter Blue/Cyan */
+    
+    /* --- COMMON STYLES --- */
+    --scifi-dark-bg: #000000;    /* Pure Black */
+    --scifi-dark-fill: #1A0D00;  /* Subtle Button Background */
+    
+    /* --- SHAPE CONTROL --- */
+    --cut-depth: 10px;           /* Angled corner size */
+    --total-length: 170px;       /* Button width */
+    --padding-vertical: 8px;     /* Button height/breathing room */
+    --border-thin: 2px;          /* Thickness for Sides 1, 3, 5, 6 */
+    --border-thick: 4px;         /* Thickness for Sides 2, 4 (Top/Bottom) */
+}
+
+/* --- 2. Button Container (Only ensuring centering) --- */
+.sp-btn-container {
+    display: flex;
+    justify-content: center !important;
+    width: 100%;
+}
+/* ------------------------------------------------------------------ */
+/* --- 3. CLAIM BUTTON (TARGETING: #sp-collect-btn) --- */
+/* ------------------------------------------------------------------ */
+/* Targeting the ID ensures the highest specificity to override any existing .auth-btn styles */
+#sp-collect-btn {
+    /* SIZE & LAYOUT */
+    position: relative;
+    width: var(--total-length);
+    padding: var(--padding-vertical) 10px;
+    font-weight: 700;
+    font-size: 1.0em;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    
+    /* CRITICAL FIX: Use Flexbox for robust internal centering */
+    display: flex;             /* Treat this element as a flex container */
+    justify-content: center;   /* Center items horizontally */
+    align-items: center;       /* Center items vertically (if needed, but good practice) */
+    
+    cursor: pointer;
+
+    /* APPEARANCE (CLAIM state defaults: GOLD) */
+    background: var(--scifi-dark-fill);
+    /* ... rest of your APPEARANCE styles ... */
+    color: var(--claim-light);
+    text-shadow: 0 0 8px var(--claim-light);
+
+    /* CRITICAL: OCTAGONAL SHAPE */
+    border-radius: 0 !important; /* Ensure old rounded corners are removed */
+
+    -webkit-clip-path: polygon(
+        var(--cut-depth) 0%, calc(100% - var(--cut-depth)) 0%, 100% 50%,
+        calc(100% - var(--cut-depth)) 100%, var(--cut-depth) 100%, 0% 50%
+    );
+    clip-path: polygon(
+        var(--cut-depth) 0%, calc(100% - var(--cut-depth)) 0%, 100% 50%,
+        calc(100% - var(--cut-depth)) 100%, var(--cut-depth) 100%, 0% 50%
+    );
+
+    /* BORDER IMPLEMENTATION (Sides 1-6) */
+    border: var(--border-thin) solid var(--claim-main);
+    box-shadow:
+        /* Outer Glow (Bolding up angled/vertical sides 1, 3, 5, 6) */
+        0 0 15px var(--claim-main)ff, 0 0 25px var(--claim-main)50,
+        /* THICK Inner Border (Side 2 - Top, Side 4 - Bottom) */
+        inset 0 var(--border-thick) 0 var(--claim-main),
+        inset 0 calc(0px - var(--border-thick)) 0 var(--claim-main);
+
+    transition: all 0.2s ease-in-out;
+    z-index: 1;
+    overflow: hidden;
+}
+/* Ensure the text is visible */
+/* --- 4. ACTIVE/HOVER STATE (CLAIM) --- */
+#sp-collect-btn:not([disabled]):not([data-collected="true"]):hover {
+    color: var(--claim-light);
+    text-shadow: 0 0 18px var(--claim-light), 0 0 30px var(--claim-main);
+    
+    /* MAX GLOW ON HOVER (Gold/Amber) */
+    border-color: var(--claim-light);
+    box-shadow: 
+        /* Increased Glow */
+        0 0 25px var(--claim-light)ff,      
+        0 0 50px var(--claim-main)ff,     
+        /* Increased THICK Inner Border (Side 2 & 4) */
+        inset 0 var(--border-thick) 0 var(--claim-light), 
+        inset 0 calc(0px - var(--border-thick)) 0 var(--claim-light);
+}
+
+
+/* ------------------------------------------------------------------ */
+/* --- 5. CLAIMED/DISABLED STATE (BLUE) --- */
+/* ------------------------------------------------------------------ */
+#sp-collect-btn[disabled],
+#sp-collect-btn[data-collected="true"] {
+    cursor: not-allowed;
+    background: var(--scifi-dark-bg); 
+    color: var(--claimed-light); 
+    text-shadow: 0 0 10px var(--claimed-light)ff;
+    
+    /* BLUE GLOW & BORDER */
+    border-color: var(--claimed-main); 
+    box-shadow: 
+        0 0 10px var(--claimed-main)ff, 
+        0 0 20px var(--claimed-main)50,
+        /* Blue THICK Inner Border (Side 2 & 4) */
+        inset 0 var(--border-thick) 0 var(--claimed-main), 
+        inset 0 calc(0px - var(--border-thick)) 0 var(--claimed-main);
+    
+    animation: pulseBlueGlow 2s infinite alternate;
+}
+
+/* --- FINAL FIX FOR LEFT-ALIGNED TEXT --- */
+/* This targets the text span inside the main button ID to force centering. */
+#sp-collect-btn .collect-text {
+    /* Ensure the span takes up the full width of the button */
+    display: block; 
+    width: 100%;
+    /* The final command to center the text within that block */
+    text-align: center !important; 
+}
+/* --- NEW CENTERING WRAPPER --- */
+/* This centers the entire fixed-width button block within the page content. */
+.sp-btn-wrapper {
+    /* Critical: Makes the container full width and ready for centering */
+    width: 100%;
+    text-align: center; /* This centers the button block (if it's inline-block) */
+    /* Alternative for block-level centering: */
+    display: flex;
+    justify-content: center;
+}
+
+/* --- FIX #sp-collect-btn's internal text alignment --- */
+#sp-collect-btn {
+    /* Critical: Ensures the text inside the fixed-width button is centered */
+    text-align: center;
+    
+    /* Since the content is direct, use Flexbox to center the text visually */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
