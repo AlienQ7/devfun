@@ -1,5 +1,5 @@
 <?php
-// index.php (V7.7.1 - FIX: Maintenance Lockout Visuals)
+// index.php (V7.0.0 - FIX: Maintenance Lockout Visuals)
 // --- CRITICAL CONFIGURATION ---
 ini_set('display_errors', 1);
 error_reporting(E_ALL & ~E_DEPRECATED & ~E_WARNING);
