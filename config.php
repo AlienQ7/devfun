@@ -1,13 +1,11 @@
 <?php
-// config.php (V7.1.0 - )
+// config.php (V7.0.0 - )
 const DB_FILE_PATH = __DIR__ . '/data.db';
-/*const DB_FILE_PATH = 'data.db'; */
-// config.php
 define('TEST_TIME_OVERRIDE', null);
 const TIMEZONE_RESET = 'Asia/Kolkata';
 define('SESSION_TTL_SECONDS', 220898400); // 7 years 
-const TASK_COMPLETION_REWARD = 2;     // Points gained per task (Task_Points)
-const DAILY_CHECKIN_REWARD = 10;       // Points gained for daily sign-in (SP_Points)
+const TASK_COMPLETION_REWARD = 2;     
+const DAILY_CHECKIN_REWARD = 10;    
 const DAILY_FAILURE_PENALTY = 2;      
 const RANK_THRESHOLDS = [
     ['sp' => 16500, 'title' => 'Code Wizard 🧙', 'desc' => 'The ultimate level of mastery. You command technology with effortless grace, optimizing systems and pioneering new solutions. You are the architect of the digital world.'],
