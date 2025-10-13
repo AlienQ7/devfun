@@ -15,7 +15,7 @@ pkg install php
 ​Now lets clone the git repo on to our  Termux and handle r7p script or tool that launch local host website using php.
 1. Cloning Git repo.
 ```bash
-git clone https://github.com/AlienQ7/dev.git
+git clone https://github.com/AlienQ7/DevConsole.git
 ```
 2.Moving file to bin directory for easy access.
 ```bash
