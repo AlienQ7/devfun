@@ -1,16 +1,12 @@
 <?php
 // index.php (V7.7.1 - FIX: Maintenance Lockout Visuals)
-
 // --- CRITICAL CONFIGURATION ---
 ini_set('display_errors', 1);
 error_reporting(E_ALL & ~E_DEPRECATED & ~E_WARNING);
 require_once 'config.php';
 require_once 'DbManager.php';
-
 // Set timezone from config (CRITICAL for DateTime objects)
 date_default_timezone_set(defined('TIMEZONE_RESET') ? TIMEZONE_RESET : 'UTC'); 
-
-
 // --- UNIVERSAL TIME GETTER FOR TESTING ---
 function getCurrentTime() {
     $timezone = defined('TIMEZONE_RESET') ? TIMEZONE_RESET : 'UTC';
@@ -21,19 +17,15 @@ function getCurrentTime() {
                            TEST_TIME_OVERRIDE !== null && 
                            TEST_TIME_OVERRIDE !== '' &&
                            strtolower(TEST_TIME_OVERRIDE) !== 'null' && 
-                           TEST_TIME_OVERRIDE !== '0';
-                           
+                           TEST_TIME_OVERRIDE !== '0';                      
     if ($is_override_enabled) {
         $date_part = date('Y-m-d'); 
-        
-        // This line only runs if TEST_TIME_OVERRIDE is a valid time string.
+          // This line only runs if TEST_TIME_OVERRIDE is a valid time string.
         return new DateTime("{$date_part} " . TEST_TIME_OVERRIDE, $dtz);
     }
-    
     // If override is disabled, use the real time.
     return new DateTime('now', $dtz);
 }
-
 // --- INITIALIZATION ---
 try {
     $dbManager = new DbManager(); 
@@ -41,11 +33,7 @@ try {
     // If DbManager fails (e.g., SQLite3 missing, though your test showed it's now working)
     die("Application Setup Error: " . $e->getMessage());
 }
-
-// =================================================================
 // --- ALL FUNCTION DEFINITIONS GO HERE (No execution logic yet) ---
-// =================================================================
-
 // --- SESSION & AUTHENTICATION MANAGEMENT ---
 function getCurrentUser($dbManager) {
     $sessionToken = $_COOKIE['session'] ?? null;
@@ -93,7 +81,6 @@ function getRankTitle($sp_points) {
     }
     return 'Aspiring 🚀'; 
 }
-
 function updateUserData(&$user, $dbManager) {
     $newRank = getRankTitle($user['sp_points']);
     $user['rank'] = $newRank; 
@@ -115,24 +102,15 @@ function updateUserData(&$user, $dbManager) {
     ];
     $dbManager->saveUserData($user['username'], $dataToSave);
 }
-
-/**
- * [FIX #2 - RESET LAG FIX]
- * Implements an immediate timestamp update and save (Lock) to prevent concurrent 
- * or repeated heavy reset calculations during the midnight transition.
- */
+/* [FIX #2 - RESET LAG FIX]*/
 function checkDailyReset(&$user, $dbManager) {
     $now = getCurrentTime(); 
     $today_midnight_ts = (clone $now)->setTime(0, 0, 0)->getTimestamp();
 
     if ($user['last_task_refresh'] < $today_midnight_ts) {
-        // --- CRITICAL LOCK/OPTIMIZATION START ---
-        // 1. Immediately update and save the refresh time to the DB.
-        // This LOCKS out any simultaneous/immediate second request, preventing lag.
         $user['last_task_refresh'] = $now->getTimestamp();
         $dbManager->saveUserData($user['username'], ['last_task_refresh' => $user['last_task_refresh']]);
         // --- CRITICAL LOCK/OPTIMIZATION END ---
-
         // --- FAILURE LOGIC (Flat fail count preserved as requested) ---
         if ($user['is_failed_system_enabled'] == 1 && defined('DAILY_FAILURE_PENALTY')) {
             $missingQuota = $user['daily_quota'] - $user['daily_completed_count'];
@@ -152,7 +130,6 @@ function checkDailyReset(&$user, $dbManager) {
             }
         }
         // --- END FAILURE LOGIC ---
-        
         $tasksJson = $dbManager->getTasks($user['username'], 'all_tasks');
         $tasks = json_decode($tasksJson, true) ?: [];
         $updatedTasks = [];
@@ -166,36 +143,26 @@ function checkDailyReset(&$user, $dbManager) {
                 $updatedTasks[] = $task;
             } 
         }
-        
         $dbManager->saveTasks($user['username'], 'all_tasks', json_encode($updatedTasks));
-
         $user['daily_completed_count'] = 0; 
         // last_task_refresh is already updated and saved above (the LOCK).
     }
     updateUserData($user, $dbManager);
 }
-
 function handleSpCollect(&$user, $dbManager) {
     header('Content-Type: application/json');
 
     $now = getCurrentTime();
     $today_midnight_ts = (clone $now)->setTime(0, 0, 0)->getTimestamp();
-    
-    // FIX V7.5.3: Ensure last_sp_collect is an integer for reliable comparison.
     $last_collect_ts = (int)($user['last_sp_collect'] ?? 0); 
-
-    // FIX #1: Eligibility relies ONLY on the last collection time vs midnight.
     $isEligible = (
         $last_collect_ts < $today_midnight_ts
     );
 
     if (!$isEligible) {
-        // This message is now redundant but kept as a server-side safeguard.
-        // JS will now handle the pop-up for a smoother user experience.
         echo json_encode(['success' => false, 'message' => 'Error: Daily Diamond has already been collected today. Try again after 12:00 AM!']);
         return;
     }
-
     // --- V7.6.1 FIX: Use constant DAILY_CHECKIN_REWARD ---
     $reward = defined('DAILY_CHECKIN_REWARD') ? DAILY_CHECKIN_REWARD : 10;
     $user['sp_points'] += $reward;
@@ -211,7 +178,6 @@ function handleSpCollect(&$user, $dbManager) {
         'rank' => $user['rank']
     ]);
 }
-
 // --- AJAX ENDPOINTS ---
 function handleTaskActions(&$user, $dbManager) {
     header('Content-Type: application/json');
@@ -219,7 +185,6 @@ function handleTaskActions(&$user, $dbManager) {
     $taskId = $_POST['id'] ?? null;
     $taskText = $_POST['text'] ?? null;
     $isPermanent = (($_POST['permanent'] ?? 'false') === 'true'); 
-
     $tasksJson = $dbManager->getTasks($user['username'], 'all_tasks');
     $tasks = json_decode($tasksJson, true) ?: [];
     $response = ['success' => false, 'message' => ''];
@@ -268,11 +233,7 @@ function handleTaskActions(&$user, $dbManager) {
                             if ($user['claimed_task_points'] < 0) {
                                 $user['claimed_task_points'] = 0;
                             }  
-                            
-                            // *** V7.7.0 FIX: Deduct the daily completed count as well ***
                             $user['daily_completed_count']--; 
-                            // *************************************************************
-                            
                             $task['claimed'] = false; // Revert claimed status
                             $response['points_change'] = '-'.$reward . ' (Reverted)';
                         } else {
@@ -283,15 +244,9 @@ function handleTaskActions(&$user, $dbManager) {
 
                     break;
                 }
-                
                 if ($action === 'delete') {
-                    // *** FINAL LOGIC: DELETE IS NON-REVERSING. POINTS ARE KEPT. ***
-                    
-                    // No point or count deduction is performed here, 
-                    // regardless of $task['claimed'] status.
-                    
+                    // *** FINAL LOGIC: DELETE IS NON-REVERSING. POINTS ARE KEPT. *** 
                     $response['points_change'] = '+0 (Points retained on deletion)';
-
                     unset($tasks[$key]);
                     $tasks = array_values($tasks); 
                     $response = ['success' => true, 'id' => $taskId, 'message' => 'Task Deleted.'];
@@ -299,13 +254,7 @@ function handleTaskActions(&$user, $dbManager) {
                 }
 
                 if ($action === 'set_permanent') {
-                    // *** FINAL LOGIC: PURE METADATA CHANGE. NO STATE OR POINTS MODIFIED. ***
-                    
-                    $task['permanent'] = $isPermanent;
-                    
-                    // DO NOT TOUCH completed, claimed, points, or daily_completed_count.
-                    // The tick mark remains if it was completed.
-                    
+                    $task['permanent'] = $isPermanent; 
                     $response = ['success' => true, 'id' => $taskId, 'permanent' => $isPermanent];
                     break;
                 }
@@ -348,21 +297,15 @@ function handleObjectiveSave(&$user, $dbManager) {
 
 function handleQuotaSave(&$user, $dbManager) {
     header('Content-Type: application/json');
-    
-    // V7.6.1 FIX: Removed max quota logic.
     $quota = (int)($_POST['quota'] ?? 1); 
-    
     if ($quota < 1) {
         $quota = 1;
     }
-    
     // The max limit was removed in V7.6.1
-
     $user['daily_quota'] = $quota;
     updateUserData($user, $dbManager);
     echo json_encode(['success' => true, 'quota' => $quota, 'message' => 'Daily quota saved.']);
 }
-
 function handleFailureToggle(&$user, $dbManager) {
     header('Content-Type: application/json');
     
@@ -378,23 +321,16 @@ function handleFailureToggle(&$user, $dbManager) {
         'message' => "Failure System is now {$statusText}."
     ]);
 }
-
 // --- MAINTENANCE & TIME UTILITIES ---
 function checkMaintenanceStatus() {
     $now = getCurrentTime();
-    
     // --- FIX #6: Simplified and corrected time calculation ---
-    
-    // Define the time points for today (based on $now's date)
     $midnight = (clone $now)->setTime(0, 0, 0);
-
     // Time window targets
     $t_start = '23:58:00';
     $t_end = '00:02:00';
-
     $maintenanceStart = (clone $now)->setTime(23, 58, 0);
     $maintenanceEnd = (clone $now)->setTime(0, 2, 0)->modify('+1 day'); // Start of maintenance is 23:58 today, ends 00:02 tomorrow
-
     // If we are past 00:02 but before 23:58, the maintenance window is 23:58 yesterday to 00:02 today
     if ($now->getTimestamp() > $midnight->getTimestamp() && $now->getTimestamp() < (clone $midnight)->modify('+2 minutes')->getTimestamp()) {
         // We are currently in the post-midnight part of maintenance
@@ -406,8 +342,6 @@ function checkMaintenanceStatus() {
     }
 
     $isMaintenance = ($now >= $maintenanceStart && $now < $maintenanceEnd);
-
-    // Warning is always 1 minute before maintenance starts
     $warningStart = (clone $maintenanceStart)->modify('-1 minute');
     $warningEnd = $maintenanceStart;
     
@@ -421,11 +355,8 @@ function checkMaintenanceStatus() {
         'simulatedNowTimestamp' => $now->getTimestamp() 
     ];
 }
-
-
 // --- MAIN REQUEST HANDLER & HTML VIEW ---
-function handleRequest(&$user, $dbManager) {
-    
+function handleRequest(&$user, $dbManager) { 
     // Helper function used by generateHtml to render a single task slot
     function renderTaskHtml($task) {
         $completedClass = ($task['completed'] ?? false) ? 'completed-slot' : '';
@@ -433,7 +364,6 @@ function handleRequest(&$user, $dbManager) {
         $permanentIndicator = ($task['permanent'] ?? false) ? '<span class="permanent-indicator" title="Permanent Daily Task">🔒</span>' : '';
         $permanentBtnText = ($task['permanent'] ?? false) ? 'Unlock' : 'Lock';
         $nextStatus = ($task['permanent'] ?? false) ? 'false' : 'true';
-
         return '
             <div class="task-slot ' . $completedClass . '" id="task-' . ($task['id'] ?? '') . '" data-id="' . ($task['id'] ?? '') . '" data-permanent="' . (($task['permanent'] ?? false) ? 'true' : 'false') . '" data-completed="' . (($task['completed'] ?? false) ? 'true' : 'false') . '">
                 <input type="checkbox" class="task-checkbox" ' . $completedAttr . ' onchange="toggleTask(\'' . ($task['id'] ?? '') . '\')">
@@ -446,18 +376,13 @@ function handleRequest(&$user, $dbManager) {
             </div>
         ';
     }
-
-
     // Check status based on getCurrentTime()
     $status = checkMaintenanceStatus();
     $isMaintenance = $status['isMaintenance'];
-    
     $isContentFetch = ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['content_only']));
-    
     if (!$isMaintenance) {
         checkDailyReset($user, $dbManager); // [FIX #2 - RESET LAG FIX]: Now fast on subsequent loads
     }
-    
     if (isset($_GET['action'])) {
         if ($_GET['action'] === 'logout') {
             handleLogout();
@@ -465,9 +390,7 @@ function handleRequest(&$user, $dbManager) {
             handleDeleteAccount($user['username']); 
         }
     }
-
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['endpoint'])) {
-        
         // --- MAINTENANCE CHECK: BLOCK ALL POST ACTIONS ---
         if ($isMaintenance) {
             header('Content-Type: application/json');
@@ -479,7 +402,6 @@ function handleRequest(&$user, $dbManager) {
             exit;
         }
         // --- END MAINTENANCE CHECK ---
-
         $endpoint = $_POST['endpoint'];
         
         if ($endpoint === 'task_action') {
@@ -500,57 +422,40 @@ function handleRequest(&$user, $dbManager) {
         }
         exit;
     }
-    
     // CRITICAL FIX: Pass arguments matching the new signature
     $htmlContent = generateHtml($user, $dbManager, $status, 'renderTaskHtml', $isContentFetch);
-    
     if ($isContentFetch) {
         echo $htmlContent;
         exit;
     }
-    
     echo $htmlContent;
 }
-
-
 // CRITICAL FIX: Reordered parameters to fix Deprecated warning on optional argument
 function generateHtml($user, $dbManager, $status, $renderTaskHtmlCallback, $isContentOnly = false) {
-    
     $tasksJson = $dbManager->getTasks($user['username'], 'all_tasks');
     $tasks = json_decode($tasksJson, true) ?: [];
-
     $now = getCurrentTime();
     $today_midnight_ts = (clone $now)->setTime(0, 0, 0)->getTimestamp();
-    
     // FIX V7.5.3: Explicitly cast last_sp_collect to an integer to ensure comparison 
-    // works correctly even if the database returns NULL or a string like '0'.
     $last_collect_ts = (int)($user['last_sp_collect'] ?? 0); 
-
     // FIX #1: Eligibility relies ONLY on the last collection time vs midnight.
     $canCollectSp = (
         $last_collect_ts < $today_midnight_ts 
     );
-
     // V7.6.39 FIX: Changed display text from Collect/Collected to CLAIM/CLAIMED
     $spButtonText = $canCollectSp ? 'CLAIM' : 'CLAIMED';
-    
     // FIX #4: Cleaner logic for objective placeholder display
-    // Check if objective is the default string OR an empty string
     $isDefaultObjective = ($user['user_objective'] === 'Pro max programmer xd.');
     $objectiveDisplay = ($isDefaultObjective || $user['user_objective'] === '') ? '' : htmlspecialchars($user['user_objective']);
-    
     $isFailureEnabled = ($user['is_failed_system_enabled'] == 1);
     $failureToggleText = $isFailureEnabled ? 'Off' : 'On'; //'Disable System' : 'Enable System';
     $failureStatusText = $isFailureEnabled ? '⟨ON 🟢⟩' : '⟨OFF 🔴⟩'; // 'Enabled' : 'Disabled';
-
     $isMaintenance = $status['isMaintenance'];
     $isWarning = $status['isWarning'];
     $maintenanceEndTime = $status['maintenanceEndTimestamp'];
     $maintenanceStartTime = $status['maintenanceStartTimestamp'];
     $simulatedNowTime = $status['simulatedNowTimestamp'];
-
     ob_start(); 
-    
     if (!$isContentOnly):
     ?>
 <!DOCTYPE html>
@@ -571,10 +476,7 @@ function generateHtml($user, $dbManager, $status, $renderTaskHtmlCallback, $isCo
                 box-shadow: 0 0 15px #ffaa00, 0 0 20px #ffd700;
             }
         }
-
         /* --- CRITICAL LOCKOUT STYLES (FROM lockout.css) --- */
-
-        /* 1. The full-screen overlay (blocks all clicks beneath it) */
         .maintenance-overlay {
             position: fixed;
             top: 0;
@@ -595,20 +497,17 @@ function generateHtml($user, $dbManager, $status, $renderTaskHtmlCallback, $isCo
         }
 
         /* 3. The content gray-out/disable effect (Applied to the #app-wrapper) */
-        /* --- V7.7.1 FIX: Removed grayscale and blur to let background colors show --- */
         .lockout-active {
             filter: none; /*opacity(50%); /* Dim the content to focus on the overlay */
             pointer-events: none; /* CRITICAL: Prevents clicks on everything EXCEPT the overlay */
             user-select: none;
             transition: filter 0.5s ease-in-out;
         }
-        
         /* 4. The message box (The pulsing glow) */
         .lockout-message {
             /* Classy Gold/Orange Theme */
             background-color: #4a3e21;
             color: #ffd700; /* Gold text#fff8e1; */
-/*            border: 2px solid #ffaa00; /* Orange border */
             border: 3px solid #ff9800;
             padding: 30px; 
             border-radius: 8px;
@@ -634,19 +533,16 @@ function generateHtml($user, $dbManager, $status, $renderTaskHtmlCallback, $isCo
             color: #ff9800;
             text-shadow: 0 0 5px #ffaa00;
         }
-
         /* --- MARQUEE STYLES --- */
         .pre-warning-marquee {
             width: 100%;
-            background-color: #333;
-            color: #00ff99;
+            background-color: #FFBF00;
+            color: white;
             padding: 5px 0;
             font-size: 0.9em;
             text-align: center;
             border-bottom: 2px solid #ff9900;
         }
-        /* --- V7.6.41 JS FIX CSS: Visual lock during AJAX --- */
-        .collecting-in-progress {
             opacity: 0.5;
             pointer-events: none; /* CRITICAL: Prevents clicks while AJAX is running */
             cursor: default;
@@ -775,7 +671,6 @@ function generateHtml($user, $dbManager, $status, $renderTaskHtmlCallback, $isCo
 </div>
 </div> 
 <?php endif; // <-- This is the closing statement for if (!$isContentOnly): ?>
-
 <div class="maintenance-overlay <?php echo $isMaintenance ? 'active' : ''; ?>" id="maintenance-overlay">
     <div class="lockout-message">
         <h2>System is in Hospital 🏥</h2>
@@ -785,8 +680,6 @@ function generateHtml($user, $dbManager, $status, $renderTaskHtmlCallback, $isCo
         </span>
     </div>
 </div>
-
-
 <?php if (!$isContentOnly): ?>
 <script>
     // --- MAINTENANCE VARIABLES PASSED FROM PHP ---
@@ -847,7 +740,6 @@ function generateHtml($user, $dbManager, $status, $renderTaskHtmlCallback, $isCo
         if (!appWrapper.classList.contains('lockout-active') && !overlay.classList.contains('active')) {
             return;
         }
-
         // Use the elapsed time to project the current simulated time
         const currentTime = SIMULATED_NOW_TS + simulatedSecondsElapsed;
         const remainingSeconds = MAINTENANCE_END_TS - currentTime;
@@ -876,8 +768,7 @@ function generateHtml($user, $dbManager, $status, $renderTaskHtmlCallback, $isCo
         simulatedSecondsElapsed++;
 
         setTimeout(updateCountdown, 1000);
-    }
-    
+    } 
     async function fetchUpdatedContent() {
         const response = await fetch('index.php?content_only=1&t=' + Date.now());
         const newHtml = await response.text();
@@ -910,9 +801,6 @@ function generateHtml($user, $dbManager, $status, $renderTaskHtmlCallback, $isCo
         const permanentIndicator = task.permanent ? '<span class="permanent-indicator" title="Permanent Daily Task">🔒</span>' : '';
         const permanentBtnText = task.permanent ? 'Unlock' : 'Lock';
         const nextStatus = task.permanent ? 'false' : 'true';
-
-        // NOTE: The PHP's htmlspecialchars() call on task.text is critical here for XSS prevention.
-        // Assuming task.text from AJAX response is already safe or is being escaped on the server side (as it is).
         return `
             <div class="task-slot ${completedClass}" id="task-${task.id}" data-id="${task.id}" data-permanent="${task.permanent}" data-completed="${task.completed}">
                 <input type="checkbox" class="task-checkbox" ${completedAttr} onchange="toggleTask('${task.id}')">
@@ -957,7 +845,6 @@ function generateHtml($user, $dbManager, $status, $renderTaskHtmlCallback, $isCo
             if (response.status === 503) {
                  alert("System is in Hospital 🏥. Please wait for the daily reset.");
                  if (result.message && result.message.includes('Hospital')) {
-                     // Since POST failed due to maintenance, trigger a reload to activate the lockout UI/timer
                      window.location.reload(); 
                  }
                  return { success: false, message: result.message || 'Maintenance Mode' };
@@ -994,7 +881,6 @@ function generateHtml($user, $dbManager, $status, $renderTaskHtmlCallback, $isCo
             alert(result.message);
         }
     }
-
     async function toggleTask(id) {
         const slot = document.getElementById(`task-${id}`);
         const isCompleted = slot.dataset.completed === 'true';
@@ -1021,14 +907,11 @@ function generateHtml($user, $dbManager, $status, $renderTaskHtmlCallback, $isCo
              slot.querySelector('.task-checkbox').checked = isCompleted;
         }
     }
-
     async function deleteTask(id) {
         if (document.getElementById('app-wrapper').classList.contains('lockout-active')) {
             alert("System is in Hospital 🏥. Please wait for the daily reset.");
             return;
         }
-        
-        // No need to check if points were claimed, the PHP side handles point deduction/count decrement logic on deletion.
         if (!confirm("Confirm mission abort (REMOVE)?")) return; 
         
         const result = await postAction({ 
@@ -1086,7 +969,6 @@ function generateHtml($user, $dbManager, $status, $renderTaskHtmlCallback, $isCo
             alert(result.message);
         }
     }
-
 // --- DEFINITIVE COLLECT SP FUNCTION (FIXED UI UPDATE) ---
     async function collectSp() {
         const button = document.getElementById('sp-collect-btn');
@@ -1096,7 +978,6 @@ function generateHtml($user, $dbManager, $status, $renderTaskHtmlCallback, $isCo
              alert("System is in Hospital 🏥. Please wait for the daily reset.");
              return;
         }
-        
         // Fix 1: Instant feedback for 'CLAIMED' state
         if (button.getAttribute('data-collected') === 'true') {
             alert('Error: Daily Diamond has already been collected today. Try again after 12:00 AM!');
@@ -1128,10 +1009,7 @@ function generateHtml($user, $dbManager, $status, $renderTaskHtmlCallback, $isCo
             });
             
             // --- THE CRITICAL UI FIX ---
-            button.textContent = 'CLAIMED'; // <--- UPDATING THE BUTTON'S TEXT CONTENT DIRECTLY
-            // ---------------------------
-            
-            // Update the state attribute and remove temporary visual lock
+            button.textContent = 'CLAIMED'; 
             button.setAttribute('data-collected', 'true');
             button.classList.remove('collecting-in-progress'); 
 
@@ -1140,7 +1018,6 @@ function generateHtml($user, $dbManager, $status, $renderTaskHtmlCallback, $isCo
             button.classList.remove('collecting-in-progress');
         }
     }
-// --- END DEFINITIVE COLLECT SP FUNCTION ---
     async function saveDailyQuota() {
         const input = document.getElementById('daily-quota-input');
         let quota = parseInt(input.value.trim(), 10);
@@ -1161,11 +1038,6 @@ function generateHtml($user, $dbManager, $status, $renderTaskHtmlCallback, $isCo
             alert(result.message);
         }
     }
-    
-    /**
-     * [FIX 2: Fail System Toggle]
-     * Adds logic to hide/show the quota input and failed stat line when toggling ON/OFF.
-     */
     async function toggleFailureSystem() {
         if (document.getElementById('app-wrapper').classList.contains('lockout-active')) {
              alert("System is in Hospital 🏥. Please wait for the daily reset.");
@@ -1190,8 +1062,6 @@ function generateHtml($user, $dbManager, $status, $renderTaskHtmlCallback, $isCo
             toggleBtn.textContent = isEnabled ? 'Off' : 'On'; 
             statusTextSpan.textContent = `Fail System: ${isEnabled ? '⟨ON 🟢⟩' : '⟨OFF 🔴⟩'}`;
             toggleBtn.setAttribute('data-enabled', isEnabled ? 'true' : 'false');
-            
-            
             // 2. CRITICAL UI FIX: Hide/Show elements instantly
             if (isEnabled) {
                 // If turning ON, create/show the elements that PHP hid
@@ -1279,13 +1149,7 @@ function generateHtml($user, $dbManager, $status, $renderTaskHtmlCallback, $isCo
 <?php
     return ob_get_clean(); 
 }
-
-// =================================================================
 // --- APPLICATION EXECUTION START (The final fix for the crash) ---
-// =================================================================
-
-// --- 1. SESSION & AUTHENTICATION MANAGEMENT (The critical block) ---
-$loggedInUser = null;
 $loggedIn = false;
 
 try {
@@ -1298,24 +1162,17 @@ try {
 
 } catch (Throwable $e) {
     // This robustly catches the fatal error (white screen) and allows the script 
-    // to continue as a logged-out guest, fixing the crash.
     error_log("CRITICAL AUTH FAILURE: " . $e->getMessage()); 
     $loggedInUser = null;
     $loggedIn = false;
 }
-
 // --- 2. MAIN REQUEST HANDLING ---
 if ($loggedInUser) {
     handleRequest($loggedInUser, $dbManager);
 } else {
-    // If not logged in, redirect to auth.php (assuming you have one)
-    // If you don't have auth.php, you need to handle login/register display here.
     header('Location: auth.php'); 
     exit;
 }
-
-// --- 3. CLEANUP ---
-// Close the database connection
 if (isset($dbManager)) {
     $dbManager->close();
 }
