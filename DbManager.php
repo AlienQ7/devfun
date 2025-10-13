@@ -1,5 +1,5 @@
 <?php
-// DbManager.php (V7.5.5 - FIX: Corrected createUser SQL for reliability)
+// DbManager.php (V7.0.0 - FIX: Corrected createUser SQL for reliability)
 class DbManager {
     private $db;
 
@@ -102,10 +102,6 @@ class DbManager {
         $this->db->exec('BEGIN TRANSACTION');
 
         try {
-            // FIX V7.5.4: The fields last_sp_collect and last_task_refresh have DEFAULTS in the schema,
-            // so we don't need to explicitly set them to 0 here, which simplifies the SQL and 
-            // prevents a potential binding error. Only inserting the NOT NULL fields.
-            
             // 1. Insert into users table
             // *** CORRECTION APPLIED HERE ***
             $sqlUser = 'INSERT INTO users (username, password_hash) 
@@ -193,7 +189,6 @@ class DbManager {
         $this->deleteSessionByUsername($username);
     }
     // CRUD Operations for Tasks
-    /* Retrieves task data for a user.*/
     public function getTasks($username, $taskType) {
         $stmt = $this->db->prepare('SELECT task_data FROM tasks WHERE username = :username');
 
