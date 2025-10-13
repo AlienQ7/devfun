@@ -1,6 +1,5 @@
-/* V7.1
+/* V7.0.0
 /* lockout.css */
-
 /* --- KEYFRAMES FOR GLOW --- */
 @keyframes pulseGlow {
     from {
@@ -10,7 +9,6 @@
         box-shadow: 0 0 15px #ffaa00, 0 0 20px #ffd700;
     }
 }
-
 /* --- LOCKOUT MESSAGE STYLING (The Glowing Box) --- */
 .lockout-message {
     /* Classy Gold/Orange Theme */
@@ -37,7 +35,6 @@
     font-size: 1.5em;
     color: #ffaa00 !important; /* Orange highlight for timer */
 }
-
 /* --- OVERLAY CONTAINER --- */
 .maintenance-overlay {
     position: fixed;
@@ -55,8 +52,6 @@
 .maintenance-overlay.active {
     visibility: visible;
 }
-
-
 /* --- VISUAL DISABLED STATE FOR LOCKOUT (Applied to the #app-wrapper) --- */
 .lockout-active {
     /* Filters are applied to the wrapper, NOT its children, preventing glow conflict */
@@ -66,8 +61,6 @@
     /* This makes sure the app wrapper is visually distinct */
     transition: filter 0.5s ease-in-out; 
 }
-
-
 /* --- VISUAL DISABLED STATE FOR LOCKOUT (Elements - from your provided CSS) --- */
 .lockout-active button:disabled,
 .lockout-active input:disabled,
