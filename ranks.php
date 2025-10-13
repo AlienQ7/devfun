@@ -1,18 +1,14 @@
 <?php
-//  ranks.php (V7.1 FINAL - FIX: Full 14-Rank List and Descriptions)
+//  ranks.php (V7.0.0 FINAL - FIX: Full 14-Rank List and Descriptions)
 // --- INITIALIZATION: MUST BE FIRST ---
 ini_set('display_errors', 0);
 error_reporting(E_ALL & ~E_DEPRECATED & ~E_WARNING);
-
 // 1. Include the necessary files
 require_once 'config.php';
 require_once 'DbManager.php';
-
-// Check if TIMEZONE_RESET is defined (it should be, via config.php)
 if (defined('TIMEZONE_RESET')) {
     date_default_timezone_set(TIMEZONE_RESET); 
 }
-
 // 2. Database Connection
 try {
     $dbManager = new DbManager(); 
@@ -32,8 +28,6 @@ if (!function_exists('getRankTitle')) {
          return 'Aspiring 🚀'; 
      }
 }
-
-
 // 3. User Authentication/Retrieval
 function getCurrentUser($dbManager) {
     $sessionToken = $_COOKIE['session'] ?? null;
@@ -51,9 +45,7 @@ function getCurrentUser($dbManager) {
     
     return $userData;
 }
-
 $user = getCurrentUser($dbManager);
-
 // If not logged in, redirect them back to the login page
 if (!$user) {
     header('Location: auth.php');
@@ -80,8 +72,6 @@ if (!defined('RANK_THRESHOLDS')) {
 
 // Ensure the ranks are sorted descending for display (highest rank first)
 $ranks = array_reverse(RANK_THRESHOLDS);
-
-
 // --- HTML RENDERING ---
 ?>
 <!DOCTYPE html>
