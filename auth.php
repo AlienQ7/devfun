@@ -1,5 +1,5 @@
 <?php
-// auth.php (V7.1 - FINAL FIX: HTML display, Login/Redirect execution)
+// auth.php (V7.0.0 - FINAL FIX: HTML display, Login/Redirect execution)
 // --- 1. CONFIGURATION & DEPENDENCIES ---
 ini_set('display_errors', 0); 
 error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);
@@ -28,7 +28,6 @@ if ($sessionToken) {
         exit;
     }
 }
-
 // --- 4. CORE AUTHENTICATION LOGIC ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
@@ -60,10 +59,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     } elseif ($action === 'login') {
-        
         // --- B. LOGIN ACCOUNT ---
         $userData = $dbManager->getUserData($username);
-
         // CRITICAL FIX from V2.6: Safely retrieve the stored hash. 
         $storedHash = $userData['password_hash'] ?? ''; 
 
@@ -80,7 +77,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-
 $dbManager->close(); // Close DB connection before rendering HTML
 // HTML VIEW
 ?>
@@ -207,7 +203,6 @@ $dbManager->close(); // Close DB connection before rendering HTML
             toggleLink.textContent = 'Register';
         }
     }
-
     // Initialize the toggle state on page load based on post data, if any
     document.addEventListener('DOMContentLoaded', () => {
         if (document.getElementById('auth-action').value === 'register') {
