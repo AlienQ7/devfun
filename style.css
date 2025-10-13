@@ -1,5 +1,4 @@
-/* style.css (V7.6.45 - Definitive Elite Console: Hexagonal Button Replaced with Standard Glowing Button)*/
-
+/* style.css (V7.0.0 - Definitive Elite Console: Hexagonal Button Replaced with Standard Glowing Button)*/
 /* --- 0. KEYFRAME ANIMATION FOR GLOW --- */
 @keyframes pulseGlow {
     from {
@@ -10,7 +9,6 @@
         box-shadow: 0 0 15px var(--acc)80, 0 0 20px var(--acc)30;
     }
 }
-
 /* --- 1. CSS CUSTOM PROPERTIES (VARIABLES) - ROOT BLOCK --- */
 :root {
     /* FUTURISTIC CONSOLE (HIGH CONTRAST BLACK/AMBER) */
@@ -326,9 +324,7 @@ input[type="text"]:focus, input[type="password"]:focus, #new-task-input:focus, #
     color: var(--fg);
 } 
 
-/* ------------------------------------------------------------------ */
 /* --- 5. CLAIM/CLAIMED BUTTON - STANDARD GLOWING RECTANGLE (V7.6.45) --- */
-/* ------------------------------------------------------------------ */
 .sp-btn-container {
     margin-top: -10px;
     display: flex;
@@ -448,8 +444,6 @@ input[type="text"]:focus, input[type="password"]:focus, #new-task-input:focus, #
     box-shadow: 0 0 10px var(--acc);
     color: var(--bg);
 }
-
-
 /*--- FAILURE SYSTEM & QUOTA OVERRIDES CONTAINER --- */
 .failure-toggle-wrapper {
     display: flex;
@@ -469,12 +463,7 @@ input[type="text"]:focus, input[type="password"]:focus, #new-task-input:focus, #
     padding-top: 15px;
     gap: 10px; 
 }
-
-
-/* ------------------------------------------------------------------ */
 /* --- 7. QUOTA AND FAIL SYSTEM BUTTON OVERRIDES (V7.6.42 FIXES) --- */
-/* ------------------------------------------------------------------ */
-
 /* 1. Set Quota Button (EXPLICIT HEIGHT/PADDING FOR ALIGNMENT + Vertical Adjust) */
 .quota-input-container .set-quota-btn {
     /* *** CRITICAL FIX: Explicit height and padding to match the input box *** */
@@ -526,12 +515,7 @@ input[type="text"]:focus, input[type="password"]:focus, #new-task-input:focus, #
     color: var(--acc) !important;
     box-shadow: 0 0 12px var(--acc) !important;
 }
-
-
-/* ------------------------------------------------------------------ */
 /* --- 8. DAILY QUOTA TEXT & INPUT GLOW (V7.6.42 FIXES) --- */
-/* ------------------------------------------------------------------ */
-
 /* Text glow for "Daily Quota:" label */
 .quota-input-container .quota-label {
     color: var(--acc); 
@@ -539,7 +523,6 @@ input[type="text"]:focus, input[type="password"]:focus, #new-task-input:focus, #
     white-space: nowrap;
     text-shadow: 0 0 5px var(--acc)80; 
 }
-
 /* Border and glow for the quota input field - HEIGHT/ALIGNMENT FIX */
 .quota-input-container .quota-input {
     width: 60px; 
@@ -563,11 +546,7 @@ input[type="text"]:focus, input[type="password"]:focus, #new-task-input:focus, #
     box-shadow: 0 0 12px var(--acc); 
     outline: none;
 }
-
-
-/* ------------------------------------------------------------------ */
 /* --- 9. SKEWED PARALLELOGRAM SEPARATOR (V7.6.44) --- */
-/* ------------------------------------------------------------------ */
 .quota-separator-skew {
     /* Base Dimensions: Full width of old separator line, small height */
     width: 60%; 
@@ -588,8 +567,6 @@ input[type="text"]:focus, input[type="password"]:focus, #new-task-input:focus, #
 .quota-separator {
     display: none; 
 }
-
-
 /*Ranks Page Styling Fixes */
 .ranks-header-container .back-link {
     color: var(--success) !important; 
@@ -628,28 +605,22 @@ input[type="text"]:focus, input[type="password"]:focus, #new-task-input:focus, #
     text-decoration: none;
     border-top: 2px solid var(--action) !important;
 }
-
 .quota-separator-skew1 {
     width: 60%;
     height: 6px;
 
-    background-color: var(--acc); /* Amber color for the line fill */
-    margin: 15px 0 25px 0; /* Center horizontally, space above/below */
-
-    /* CRITICAL: Apply the skew transformation */
+    background-color: var(--acc); 
+    margin: 15px 0 25px 0; 
     transform: skewX(-20deg);
-
-    /* Add the glow and remove rounded corners */
     border-radius: 0;
     box-shadow: 0 0 8px var(--acc)80; /* Amber glow */
 }
 .collecting-in-progress {
     opacity: 0.5; /* Makes the button visually dim/fade */
-    pointer-events: none; /* Prevents clicks while AJAX is running */
+    pointer-events: none;
 }
 #auth-submit-btn {
     background-color: var(--acc); /* Example: A purple background */
     color: var(--fg);
-    /* border: 1px solid #9966CC; */ /* Lighter purple border */
     box-shadow: 0 0 10px var(--darbur); */ /* Subtle glow */
 }
