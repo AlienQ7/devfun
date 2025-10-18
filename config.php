@@ -1,7 +1,7 @@
 <?php
 // config.php (V7.0.0 - )
 const DB_FILE_PATH = __DIR__ . '/data.db';
-define('TEST_TIME_OVERRIDE', '23:57:50');
+define('TEST_TIME_OVERRIDE', null);
 const TIMEZONE_RESET = 'Asia/Kolkata';
 define('SESSION_TTL_SECONDS', 220898400); // 7 years 
 const TASK_COMPLETION_REWARD = 2;     
