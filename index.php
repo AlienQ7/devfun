@@ -466,73 +466,7 @@ function generateHtml($user, $dbManager, $status, $renderTaskHtmlCallback, $isCo
     <title>Dev Console: <?php echo htmlspecialchars($user['username']); ?></title>
     <link rel="stylesheet" href="style.css"> 
     <link rel="stylesheet" href="ui.css">
-    <style>
-        @keyframes pulseGlow {
-            from {
-                box-shadow: 0 0 5px #ffaa00, 0 0 10px #ffd700;
-            }
-            to {
-                box-shadow: 0 0 15px #ffaa00, 0 0 20px #ffd700;
-            }
-        }
-        .maintenance-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            user-select: none;
-            text-align: center;
-        }
-        .maintenance-overlay.active {
-            display: flex; 
-        }
-
-        .lockout-active {
-            filter: none; 
-            pointer-events: none; 
-            user-select: none;
-            transition: filter 0.5s ease-in-out;
-        }
-        .lockout-message {
-            background-color: #4a3e21;
-            color: #ffd700; /* Gold text#fff8e1; */
-            border: 3px solid #ff9800;
-            padding: 30px; 
-            border-radius: 8px;
-            font-weight: bold;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            font-size: 1.3em; 
-            line-height: 1.4;
-            animation: pulseGlow 1.5s infinite alternate; /* The missing glow animation! */
-            max-width: 90%;
-            font-family: monospace; /* Added for consistency, adjust if needed */
-        }
-        .lockout-message h2 {
-            color: #ffc107;
-            margin: 0 0 10px 0;
-            text-shadow: 0 0 8px #ffd700; /* Added a subtle text shadow */
-        }
-        .lockout-message .countdown {
-            display: block;
-            margin-top: 10px;
-            font-size: 1.5em;
-            /*color: #ffaa00; /* Orange highlight for timer */
-            color: #ff9800;
-            text-shadow: 0 0 5px #ffaa00;
-        }
-        .collecting-in-progress {
-            opacity: 0.5;
-            pointer-events: none;
-            cursor: default;
-        }
-    </style>
+    <link rel="stylesheet" href="lock.css">
 </head>
 <body> 
 

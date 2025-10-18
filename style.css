@@ -464,7 +464,6 @@ input[type="text"]:focus, input[type="password"]:focus, #new-task-input:focus, #
     gap: 10px; 
 }
 /* --- 7. QUOTA AND FAIL SYSTEM BUTTON OVERRIDES (V7.6.42 FIXES) --- */
-/* 1. Set Quota Button (EXPLICIT HEIGHT/PADDING FOR ALIGNMENT + Vertical Adjust) */
 .quota-input-container .set-quota-btn {
     /* *** CRITICAL FIX: Explicit height and padding to match the input box *** */
     height: 35px !important;
