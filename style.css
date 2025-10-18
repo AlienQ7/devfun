@@ -345,7 +345,7 @@ input[type="text"]:focus, input[type="password"]:focus, #new-task-input:focus, #
     justify-content: space-between; 
 }
 .task-slot.completed-slot { 
-    background-color: var(--comp-bg); 
+    background-color: var(--acc-low); 
 }
 .task-description-wrapper { 
     flex-grow: 1; 
@@ -366,7 +366,7 @@ input[type="text"]:focus, input[type="password"]:focus, #new-task-input:focus, #
     filter: drop-shadow(0 0 3px var(--acc)99); 
 }
 .task-checkbox:checked { 
-    accent-color: var(--success);
+    accent-color: var(--acc);
 }
 .task-buttons-wrapper {
     /* Anchor the buttons to the far right */
@@ -623,4 +623,14 @@ input[type="text"]:focus, input[type="password"]:focus, #new-task-input:focus, #
     background-color: var(--acc); /* Example: A purple background */
     color: var(--fg);
     box-shadow: 0 0 10px var(--darbur); */ /* Subtle glow */
+}
+/* 10 --- MARQUEE STYLES --- */
+.pre-warning-marquee {
+    width: 100%;
+    background-color: #362200;
+    color: white;
+    padding: 5px 0;
+    font-size: 0.9em;
+    text-align: center;
+    border-bottom: 2px solid #ff9900;
 }

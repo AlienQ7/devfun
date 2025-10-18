@@ -1,7 +1,7 @@
 <?php
 // index.php (V7.0.0 - FIX: Maintenance Lockout Visuals)
 // --- CRITICAL CONFIGURATION ---
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
 error_reporting(E_ALL & ~E_DEPRECATED & ~E_WARNING);
 require_once 'config.php';
 require_once 'DbManager.php';
@@ -467,7 +467,6 @@ function generateHtml($user, $dbManager, $status, $renderTaskHtmlCallback, $isCo
     <link rel="stylesheet" href="style.css"> 
     <link rel="stylesheet" href="ui.css">
     <style>
-        /* --- KEYFRAMES FOR GLOW (FROM lockout.css) --- */
         @keyframes pulseGlow {
             from {
                 box-shadow: 0 0 5px #ffaa00, 0 0 10px #ffd700;
@@ -476,36 +475,31 @@ function generateHtml($user, $dbManager, $status, $renderTaskHtmlCallback, $isCo
                 box-shadow: 0 0 15px #ffaa00, 0 0 20px #ffd700;
             }
         }
-        /* --- CRITICAL LOCKOUT STYLES (FROM lockout.css) --- */
         .maintenance-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.6); /* Darker background */
-            display: none; /* Hidden by default */
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none;
             justify-content: center;
             align-items: center;
             z-index: 1000;
             user-select: none;
             text-align: center;
         }
-        /* 2. The ACTIVE state (makes the overlay visible) */
         .maintenance-overlay.active {
             display: flex; 
         }
 
-        /* 3. The content gray-out/disable effect (Applied to the #app-wrapper) */
         .lockout-active {
-            filter: none; /*opacity(50%); /* Dim the content to focus on the overlay */
-            pointer-events: none; /* CRITICAL: Prevents clicks on everything EXCEPT the overlay */
+            filter: none; 
+            pointer-events: none; 
             user-select: none;
             transition: filter 0.5s ease-in-out;
         }
-        /* 4. The message box (The pulsing glow) */
         .lockout-message {
-            /* Classy Gold/Orange Theme */
             background-color: #4a3e21;
             color: #ffd700; /* Gold text#fff8e1; */
             border: 3px solid #ff9800;
@@ -533,18 +527,9 @@ function generateHtml($user, $dbManager, $status, $renderTaskHtmlCallback, $isCo
             color: #ff9800;
             text-shadow: 0 0 5px #ffaa00;
         }
-        /* --- MARQUEE STYLES --- */
-        .pre-warning-marquee {
-            width: 100%;
-            background-color: #FFBF00;
-            color: white;
-            padding: 5px 0;
-            font-size: 0.9em;
-            text-align: center;
-            border-bottom: 2px solid #ff9900;
-        }
+        .collecting-in-progress {
             opacity: 0.5;
-            pointer-events: none; /* CRITICAL: Prevents clicks while AJAX is running */
+            pointer-events: none;
             cursor: default;
         }
     </style>

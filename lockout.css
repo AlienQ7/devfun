@@ -52,16 +52,13 @@
 .maintenance-overlay.active {
     visibility: visible;
 }
-/* --- VISUAL DISABLED STATE FOR LOCKOUT (Applied to the #app-wrapper) --- */
+/* --- VISUAL DISABLED STATE FOR LOCKOUT --- */
 .lockout-active {
-    /* Filters are applied to the wrapper, NOT its children, preventing glow conflict */
     filter: grayscale(80%) blur(1px); 
     pointer-events: none;
     user-select: none;
-    /* This makes sure the app wrapper is visually distinct */
     transition: filter 0.5s ease-in-out; 
 }
-/* --- VISUAL DISABLED STATE FOR LOCKOUT (Elements - from your provided CSS) --- */
 .lockout-active button:disabled,
 .lockout-active input:disabled,
 .lockout-active select:disabled {
@@ -71,4 +68,9 @@
     border-color: #444 !important;
     opacity: 0.7;
     pointer-events: none; 
+}
+.collecting-in-progress {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: default;
 }
